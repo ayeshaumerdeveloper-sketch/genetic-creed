@@ -145,7 +145,11 @@ export default function AccountsPage() {
                   {/* Company Logo + Name */}
                   <Box sx={{ display: "flex", alignItems: "center", mb: 1.5 }}>
                     <Avatar
-                      src={`https://gateway-aac.apiswagger.co.uk/${company.logo?.url}`}
+                      src={
+                        company.logo?.url
+                          ? `https://gateway-aac.apiswagger.co.uk/${company.logo.url}`
+                          : "/placeholder-logo.png"
+                      }
                       alt={company.name}
                       variant="square"
                       sx={{
@@ -169,8 +173,8 @@ export default function AccountsPage() {
                     </Typography>
                   </Box>
 
-                  {/* Accounts List */}
-                  {company.accounts?.length > 0 &&
+                  {/* Accounts List (dynamic from API) */}
+                  {company.accounts?.length > 0 ? (
                     company.accounts.map((acc: any) => (
                       <Typography
                         key={acc._id}
@@ -179,31 +183,20 @@ export default function AccountsPage() {
                           ml: 5,
                           mb: 0.7,
                           fontSize: "1rem",
-                          color:
-                            isSelected &&
-                            acc.company.accountName.toLowerCase() ===
-                              "ahmed a"
-                              ? "#2AB6B6"
-                              : "#2b2b2b",
-                          fontWeight:
-                            isSelected &&
-                            acc.company.accountName.toLowerCase() ===
-                              "ahmed a"
-                              ? 600
-                              : 400,
-                          backgroundColor:
-                            isSelected &&
-                            acc.company.accountName.toLowerCase() ===
-                              "ahmed a"
-                              ? "#E1F5F5"
-                              : "transparent",
-                          borderRadius: "6px",
-                          px: isSelected ? 0.8 : 0,
+                          color: "#2b2b2b",
                         }}
                       >
-                        • {acc.company.accountName}
+                        • {acc.company?.accountName || "Unnamed Account"}
                       </Typography>
-                    ))}
+                    ))
+                  ) : (
+                    <Typography
+                      variant="body2"
+                      sx={{ ml: 5, color: "text.secondary" }}
+                    >
+                      No accounts found
+                    </Typography>
+                  )}
                 </CardContent>
               </Card>
             </Grid>
