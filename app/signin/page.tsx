@@ -32,7 +32,7 @@ export default function LoginPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setErrorMessage(null); 
+    setErrorMessage(null);
 
     try {
       const res = await signin({
@@ -40,8 +40,6 @@ export default function LoginPage() {
         password,
         timezone: "Asia/Karachi",
       }).unwrap();
-
-      console.log("API response:", res);
 
       const token = res?.data?.accessToken;
       const user = res?.data?.user;
@@ -53,8 +51,6 @@ export default function LoginPage() {
 
       router.push("/companyaccounts");
     } catch (err: any) {
-      console.error("Login failed:", err);
-
       if (err?.data?.message?.toLowerCase().includes("invalid")) {
         setErrorMessage("Invalid email or password. Please try again.");
       } else {
@@ -69,23 +65,34 @@ export default function LoginPage() {
         display: "flex",
         height: "100vh",
         bgcolor: "#fff",
-        p: 4,
+        px: 6,
+        py: 4,
       }}
     >
-      {/* LEFT SIDE */}
       <Box
         sx={{
           flex: 1,
           display: "flex",
           flexDirection: "column",
           justifyContent: "center",
-          alignItems: "center",
-          px: 4,
+          alignItems: "flex-start",
+          px: 6,
           bgcolor: "#fff",
+          ml: 4,
+          mr: 4,
         }}
       >
-        <Box sx={{ position: "absolute", top: 24, left: 40 }}>
+        <Box sx={{ position: "absolute", top: 24, left: 80 }}>
           <Image src="/logoagent.svg" alt="Agentic Creed Logo" width={140} height={40} priority />
+        </Box>
+
+        <Box textAlign="start" mb={3} sx={{ width: 600 }}>
+          <Typography variant="h5" sx={{ fontWeight: 600, mb: 1 }}>
+            Sign In to Agentic Creed
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            Let’s Get Started
+          </Typography>
         </Box>
 
         <Card
@@ -94,18 +101,10 @@ export default function LoginPage() {
             p: 5,
             boxShadow: "0px 4px 20px rgba(0,0,0,0.08)",
             borderRadius: 4,
+            border: "1px solid #d3d3d3",
           }}
         >
-          <Typography variant="h5" sx={{ fontWeight: 600, mb: 1 }}>
-            Sign In to Agentic Creed
-          </Typography>
-
-          <Typography variant="body2" color="text.secondary" mb={4}>
-            Let’s Get Started
-          </Typography>
-
           <form onSubmit={handleSubmit}>
-            {/* Email Field */}
             <TextField
               fullWidth
               label="Email"
@@ -122,7 +121,6 @@ export default function LoginPage() {
               }}
             />
 
-            {/* Password Field */}
             <TextField
               fullWidth
               label="Password"
@@ -149,14 +147,12 @@ export default function LoginPage() {
               }}
             />
 
-            {/* Error Message */}
             {errorMessage && (
               <Typography color="error" sx={{ mt: 1 }}>
                 {errorMessage}
               </Typography>
             )}
 
-            {/* Submit Button */}
             <Button
               type="submit"
               fullWidth
@@ -178,14 +174,21 @@ export default function LoginPage() {
           </form>
 
           <Box textAlign="center" mt={3}>
-            <MuiLink href="#" underline="none" color="primary">
+            <MuiLink
+              href="#"
+              underline="none"
+              sx={{
+                color: "#2cd4c0",
+                fontWeight: 500,
+                "&:hover": { color: "#26bba9" },
+              }}
+            >
               Forgot password?
             </MuiLink>
           </Box>
         </Card>
       </Box>
 
-      {/* RIGHT SIDE */}
       <Box
         sx={{
           flex: 1,
@@ -194,9 +197,12 @@ export default function LoginPage() {
           alignItems: "center",
           position: "relative",
           backgroundColor: "rgb(245, 245, 245)",
+          ml: 4,
+          mr: 4,
+          borderRadius: 3,
         }}
       >
-        <Box sx={{ position: "absolute", top: 24, right: 40 }}>
+        <Box sx={{ position: "absolute", top: 24, right: 80 }}>
           <Link href="/signup" passHref>
             <Button
               variant="contained"
@@ -213,12 +219,7 @@ export default function LoginPage() {
           </Link>
         </Box>
 
-        <Box
-          sx={{
-            borderRadius: 3,
-            p: 2,
-          }}
-        >
+        <Box sx={{ borderRadius: 3, p: 2 }}>
           <Image
             src="/dashboard-preview.webp"
             alt="Dashboard Preview"

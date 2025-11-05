@@ -9,13 +9,25 @@ import {
   Grid,
   Avatar,
   Button,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import { useGetAccountsQuery } from "@/app/services/accountsApi";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+import LogoutIcon from "@mui/icons-material/Logout";
+import BusinessIcon from "@mui/icons-material/Business";
+import ApartmentIcon from "@mui/icons-material/Apartment";
+import StorefrontIcon from "@mui/icons-material/Storefront";
+import WorkIcon from "@mui/icons-material/Work";
+import CallIcon from "@mui/icons-material/Call";
+import LoyaltyIcon from "@mui/icons-material/Loyalty";
 
 export default function AccountsPage() {
   const { data, error, isLoading } = useGetAccountsQuery();
   const [selectedCompany, setSelectedCompany] = useState<string | null>(null);
+  const [alertOpen, setAlertOpen] = useState(false);
+  const router = useRouter();
 
   if (isLoading)
     return (
@@ -32,6 +44,33 @@ export default function AccountsPage() {
     );
 
   const accountsData = data?.data || [];
+  const allowedCompanyIndex = 0;
+
+  const companyIcons: Record<string, JSX.Element> = {
+    "Air Services": <StorefrontIcon sx={{ color: "#2AB6B6" }} />,
+    "Air Sales": <WorkIcon sx={{ color: "#FF5A5F" }} />,
+    "Loyalty Program": <LoyaltyIcon sx={{ color: "#FFA726" }} />,
+    "Air Marketer": <ApartmentIcon sx={{ color: "#42A5F5" }} />,
+    "Call Center": <CallIcon sx={{ color: "#66BB6A" }} />,
+    "Air Operations": <BusinessIcon sx={{ color: "#AB47BC" }} />,
+  };
+
+  const handleCompanyClick = (company: any, index: number) => {
+    if (index !== allowedCompanyIndex) {
+      setAlertOpen(true);
+      return;
+    }
+    setSelectedCompany(company._id);
+  };
+
+  const handleAccountClick = (acc: any, index: number, company: any) => {
+    if (index !== allowedCompanyIndex) {
+      setAlertOpen(true);
+      return;
+    }
+    const companyNameSlug = company.name.replace(/\s+/g, "-");
+    router.push(`/dashboard/${companyNameSlug}`);
+  };
 
   return (
     <Box
@@ -41,7 +80,6 @@ export default function AccountsPage() {
         p: { xs: 3, md: 6 },
       }}
     >
-      {/* ---------- Top Bar ---------- */}
       <Box
         sx={{
           display: "flex",
@@ -50,7 +88,6 @@ export default function AccountsPage() {
           mb: 5,
         }}
       >
-        {/* Left Logo */}
         <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
           <Image
             src="/logoagent.svg"
@@ -61,10 +98,14 @@ export default function AccountsPage() {
           />
         </Box>
 
-        {/* Right Buttons */}
         <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
           <Button
             variant="outlined"
+            startIcon={<LogoutIcon />}
+            onClick={() => {
+              sessionStorage.removeItem("token");
+              router.push("/"); 
+            }}
             sx={{
               textTransform: "none",
               borderColor: "#d9d9d9",
@@ -99,7 +140,6 @@ export default function AccountsPage() {
         </Box>
       </Box>
 
-      {/* ---------- Header ---------- */}
       <Box sx={{ textAlign: "center", mb: 6 }}>
         <Typography
           variant="h4"
@@ -112,14 +152,15 @@ export default function AccountsPage() {
         </Typography>
       </Box>
 
-      {/* ---------- Cards Grid ---------- */}
-      <Grid container spacing={3} justifyContent="center">
-        {accountsData.map((company: any) => {
+      <Grid container spacing={4} justifyContent="center">
+        {accountsData.map((company: any, index: number) => {
           const isSelected = selectedCompany === company._id;
+          const isAllowed = index === allowedCompanyIndex;
+
           return (
             <Grid item xs={12} sm={6} md={4} lg={3} key={company._id}>
               <Card
-                onClick={() => setSelectedCompany(company._id)}
+                onClick={() => handleCompanyClick(company, index)}
                 sx={{
                   cursor: "pointer",
                   borderRadius: "18px",
@@ -128,62 +169,75 @@ export default function AccountsPage() {
                     : "1px solid #f1f1f1",
                   transition: "all 0.25s ease",
                   boxShadow:
-                    "0px 4px 15px rgba(0, 0, 0, 0.05), 0px 1px 4px rgba(0, 0, 0, 0.03)",
+                    "0px 8px 24px rgba(0, 0, 0, 0.06), 0px 4px 10px rgba(0, 0, 0, 0.04)",
                   "&:hover": {
                     boxShadow:
-                      "0px 8px 22px rgba(0, 0, 0, 0.08), 0px 3px 6px rgba(0, 0, 0, 0.04)",
-                    transform: "translateY(-4px)",
+                      "0px 12px 30px rgba(0, 0, 0, 0.08), 0px 6px 12px rgba(0, 0, 0, 0.05)",
+                    transform: "translateY(-6px)",
+                    backgroundColor: "#E3F2FD",
                   },
-                  height: 220,
+                  width: 320,
+                  height: 250,
                   display: "flex",
                   flexDirection: "column",
                   justifyContent: "center",
-                  p: 1.5,
+                  p: 2,
+                  backgroundColor: !isAllowed ? "#fafafa" : "#fff",
+                  opacity: !isAllowed ? 0.7 : 1,
                 }}
               >
                 <CardContent>
-                  {/* Company Logo + Name */}
-                  <Box sx={{ display: "flex", alignItems: "center", mb: 1.5 }}>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      mb: 1.5,
+                      gap: 1,
+                    }}
+                  >
                     <Avatar
-                      src={
-                        company.logo?.url
-                          ? `https://gateway-aac.apiswagger.co.uk/${company.logo.url}`
-                          : "/placeholder-logo.png"
-                      }
-                      alt={company.name}
-                      variant="square"
                       sx={{
-                        width: 34,
-                        height: 34,
-                        mr: 1.2,
-                        borderRadius: 1.5,
-                        backgroundColor: "#f9f9f9",
-                        objectFit: "contain",
+                        width: 44,
+                        height: 44,
+                        bgcolor: "#f3f3f3",
                       }}
-                    />
+                    >
+                      {companyIcons[company.name] || <BusinessIcon />}
+                    </Avatar>
                     <Typography
                       variant="subtitle1"
                       sx={{
                         fontWeight: 600,
                         color: "#1c1c1c",
-                        fontSize: "1.05rem",
+                        fontSize: "1.1rem",
                       }}
                     >
                       {company.name}
                     </Typography>
                   </Box>
 
-                  {/* Accounts List (dynamic from API) */}
                   {company.accounts?.length > 0 ? (
                     company.accounts.map((acc: any) => (
                       <Typography
                         key={acc._id}
                         variant="body2"
                         sx={{
-                          ml: 5,
-                          mb: 0.7,
+                          ml: 6,
+                          mb: 0.8,
                           fontSize: "1rem",
                           color: "#2b2b2b",
+                          cursor: isAllowed ? "pointer" : "not-allowed",
+                          transition: "all 0.2s ease",
+                          "&:hover": {
+                            backgroundColor: isAllowed ? "#2AB6B6" : "",
+                            color: isAllowed ? "#fff" : "",
+                            borderRadius: "6px",
+                            px: 1,
+                          },
+                        }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleAccountClick(acc, index, company);
                         }}
                       >
                         • {acc.company?.accountName || "Unnamed Account"}
@@ -192,7 +246,7 @@ export default function AccountsPage() {
                   ) : (
                     <Typography
                       variant="body2"
-                      sx={{ ml: 5, color: "text.secondary" }}
+                      sx={{ ml: 6, color: "text.secondary" }}
                     >
                       No accounts found
                     </Typography>
@@ -203,6 +257,22 @@ export default function AccountsPage() {
           );
         })}
       </Grid>
+
+      <Snackbar
+        open={alertOpen}
+        autoHideDuration={3000}
+        onClose={() => setAlertOpen(false)}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert
+          onClose={() => setAlertOpen(false)}
+          severity="error"
+          variant="filled"
+          sx={{ width: "100%" }}
+        >
+          Permission Denied — You can only access the first company
+        </Alert>
+      </Snackbar>
     </Box>
   );
 }
