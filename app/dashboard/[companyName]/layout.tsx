@@ -27,7 +27,7 @@ export default function DashboardLayout({
   const toggleDrawer = () => setOpen((prev) => !prev);
 
   return (
-    <Box sx={{ display: "flex", minHeight: "100vh", bgcolor: "#f9fafb" }}>
+    <Box sx={{ display: "flex", minHeight: "100vh",}}>
       <CssBaseline />
 
       {/* ---- MOBILE DRAWER ---- */}

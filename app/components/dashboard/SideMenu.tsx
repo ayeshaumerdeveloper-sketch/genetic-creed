@@ -28,6 +28,8 @@ import {
 } from "@mui/icons-material";
 import Image from "next/image";
 import { useParams, usePathname } from "next/navigation";
+import { useRouter } from "next/navigation";
+
 import Link from "next/link";
 
 export default function SideMenu() {
@@ -35,6 +37,9 @@ export default function SideMenu() {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const { companyName } = useParams();
   const pathname = usePathname();
+
+  const router = useRouter();
+
 
   const displayName = companyName
     ? (companyName as string).replace(/-/g, " ")
@@ -66,7 +71,6 @@ export default function SideMenu() {
         flexDirection: "column",
         justifyContent: "space-between",
         bgcolor: "#fff",
-        // borderRight: "1px solid #e0e0e0",
         overflowY: "auto",
         "&::-webkit-scrollbar": { width: "6px" },
         "&::-webkit-scrollbar-thumb": { bgcolor: "#d1d5db", borderRadius: "3px" },
@@ -178,7 +182,11 @@ export default function SideMenu() {
             <ListItemIcon sx={{ color: inactiveColor }}>
               <ExitToApp />
             </ListItemIcon>
-            <ListItemText primary="Logout" />
+            <ListItemText primary="Logout" 
+             onClick={() => {
+              sessionStorage.removeItem("token");
+              router.push("/"); 
+            }} />
           </ListItemButton>
         </List>
       </Box>

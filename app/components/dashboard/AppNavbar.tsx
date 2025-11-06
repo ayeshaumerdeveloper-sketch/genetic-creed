@@ -31,6 +31,9 @@ import {
   Menu as MenuIcon,
 } from "@mui/icons-material";
 import { useTheme } from "@mui/material/styles";
+import { useRouter } from "next/navigation";
+
+
 
 export default function AppNavbar() {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -46,7 +49,6 @@ export default function AppNavbar() {
 
   const iconStyle = { color: "#6b7280", fontSize: 22 };
 
-  // ✅ define icons with labels for tooltips
   const actionIcons = [
     { icon: Call, label: "Call" },
     { icon: Chat, label: "Chat" },
@@ -56,6 +58,10 @@ export default function AppNavbar() {
     { icon: Business, label: "Companies" },
     { icon: Group, label: "Contacts" },
   ];
+
+
+  const router = useRouter();
+
 
   return (
     <AppBar position="sticky" color="inherit" elevation={0} sx={{ borderBottom: "1px solid #f0f0f0" }}>
@@ -96,11 +102,17 @@ export default function AppNavbar() {
             >
               {actionIcons.map(({ icon: Icon, label }, i) => (
                 <Tooltip title={label} arrow key={i}>
-                  <IconButton size="small">
+                  <IconButton
+                    size="small"
+                    onClick={() => {
+                      if (label === "Chat") router.push("/social-components/chat");
+                    }}
+                  >
                     <Icon sx={iconStyle} />
                   </IconButton>
                 </Tooltip>
               ))}
+
             </Paper>
           )}
 

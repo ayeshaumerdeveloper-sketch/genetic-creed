@@ -24,7 +24,16 @@ export const accountsApi = createApi({
     }),
 
 
+    selectAccount: builder.mutation({
+      query: (body) => ({
+        url: "auth/accounts/select",
+        method: "POST",
+        body,
+        
+      }),
+    }),
+
   }),
 });
 
-export const {useGetAccountsQuery } = accountsApi;
+export const {useGetAccountsQuery ,useSelectAccountMutation } = accountsApi;

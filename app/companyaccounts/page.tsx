@@ -12,7 +12,7 @@ import {
   Snackbar,
   Alert,
 } from "@mui/material";
-import { useGetAccountsQuery } from "@/app/services/accountsApi";
+import { useGetAccountsQuery ,useSelectAccountMutation } from "@/app/services/accountsApi";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import LogoutIcon from "@mui/icons-material/Logout";
@@ -25,6 +25,8 @@ import LoyaltyIcon from "@mui/icons-material/Loyalty";
 
 export default function AccountsPage() {
   const { data, error, isLoading } = useGetAccountsQuery();
+  const [selectAccount] = useSelectAccountMutation();
+
   const [selectedCompany, setSelectedCompany] = useState<string | null>(null);
   const [alertOpen, setAlertOpen] = useState(false);
   const router = useRouter();
@@ -63,13 +65,25 @@ export default function AccountsPage() {
     setSelectedCompany(company._id);
   };
 
-  const handleAccountClick = (acc: any, index: number, company: any) => {
+  const handleAccountClick = async (acc: any, index: number, company: any) => {
     if (index !== allowedCompanyIndex) {
       setAlertOpen(true);
       return;
     }
-    const companyNameSlug = company.name.replace(/\s+/g, "-");
-    router.push(`/dashboard/${companyNameSlug}`);
+  
+    try {
+      const response = await selectAccount({ account: acc._id }).unwrap();
+  
+      console.log("Account selected successfully:", response);
+  
+      sessionStorage.setItem("selectedAccount", acc._id);
+  
+      const companyNameSlug = company.name.replace(/\s+/g, "-");
+      sessionStorage.setItem("selectedCompany", companyNameSlug);
+      router.push(`/dashboard/${companyNameSlug}`);
+    } catch (err) {
+      console.error("Error selecting account:", err);
+    }
   };
 
   return (
